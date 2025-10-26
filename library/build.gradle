@@ -50,7 +50,6 @@ afterEvaluate {
                 // Use release build output
                 from components.findByName('release')
 
-                // Explicitly add the .aar file from libs directory
                 artifact("$buildDir/outputs/aar/${project.name}-release.aar") {
                     builtBy tasks.named("assembleRelease")
                 }
