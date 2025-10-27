@@ -1,0 +1,89 @@
+plugins {
+    alias(libs.plugins.android.library)
+    id 'maven-publish'
+}
+
+android {
+    namespace 'com.rolex.slider.library'
+    compileSdk 36
+
+    defaultConfig {
+        minSdk 24
+        versionName "1.0.8"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+
+    implementation libs.appcompat
+    implementation libs.material
+    testImplementation libs.junit
+    androidTestImplementation libs.ext.junit
+    androidTestImplementation libs.espresso.core
+    implementation 'com.squareup.picasso:picasso:2.71828'
+    implementation 'com.nineoldandroids:library:2.4.0'
+}
+// Maven Publish Configuration
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                // Use release build output
+                from components.findByName('release')
+
+                artifact("$buildDir/outputs/aar/${project.name}-release.aar") {
+                    builtBy tasks.named("assembleRelease")
+                }
+
+                groupId = 'com.github.RolexOgada'
+                artifactId = 'AndroidImageSlider'
+                version = android.defaultConfig.versionName
+
+
+                pom {
+                    name.set("RolexCore Library")
+                    description.set("A library for core functionality in Rolex projects")
+                    url.set("https://github.com/RolexOgada/AndroidImageSlider")
+                    licenses {
+                        license {
+                            name.set("MIT License")
+                            url.set("https://opensource.org/licenses/MIT")
+                        }
+                    }
+                    developers {
+                        developer {
+                            id.set("rolexogada")
+                            name.set("Rolex Ogada")
+                            email.set("rolexogada@gmail.com")
+                        }
+                    }
+                    scm {
+                        connection.set("scm:git:git://github.com/RolexOgada/AndroidImageSlider.git")
+                        developerConnection.set("scm:git:ssh://git@github.com/RolexOgada/AndroidImageSlider.git")
+                        url.set("https://github.com/RolexOgada/AndroidImageSlider")
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Ensure assembleRelease is triggered during JitPack build
+tasks.configureEach { task ->
+    if (task.name == "assemble") {
+        task.dependsOn assembleRelease
+    }
+}
